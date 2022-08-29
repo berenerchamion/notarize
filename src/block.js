@@ -13,9 +13,8 @@ const SHA256 = require('crypto-js/sha256')
 const hex2ascii = require('hex2ascii')
 
 class Block {
-
   // Constructor - argument data will be the object containing the transaction data
-  constructor (data) {
+  constructor(data) {
     this.hash = null // Hash of the block
     this.height = 0 // Block Height (consecutive number of each block)
     this.body = Buffer.from(JSON.stringify(data)).toString('hex') // Will contain the transactions stored in the block, by default it will encode the data
@@ -38,13 +37,27 @@ class Block {
   validate () {
     let self = this
     return new Promise((resolve, reject) => {
-      // Save in auxiliary variable the current block hash
-      // Recalculate the hash of the Block
-      // Comparing if the hashes changed
-      // Returning the Block is not valid
-      // Returning the Block is valid
-
-    });
+      try {
+        // Save in auxiliary variable the current block hash
+        let currentHash = self.hash
+        // gotta set this to null to create the hash again
+        self.hash = null
+        // Recalculate the hash of the Block
+        let newHash = SHA256(JSON.stringify(self)).toString()
+        // put the hash back
+        self.hash = newHash
+        // Comparing if the hashes changed
+        if (currentHash === newHash) {
+          // Returning the Block is not valid
+          resolve(true)
+        } else {
+          // Returning the Block is valid
+          resolve(false)
+        }
+      } catch (err) {
+        reject(new Error(err))
+      }
+    })
   }
 
   /**
@@ -56,7 +69,7 @@ class Block {
      *  3. Resolve with the data and make sure that you don't need to return the data for the `genesis block` 
      *     or Reject with an error.
      */
-  getBData () {
+  getBData() {
     // Getting the encoded data saved in the Block
     // Decoding the data to retrieve the JSON representation of the object
     // Parse the data to an object to be retrieve.
