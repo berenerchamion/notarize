@@ -40,7 +40,8 @@ class Block {
       try {
         // Save in auxiliary variable the current block hash
         let currentHash = self.hash
-        // gotta set this to null to create the hash again
+        // gotta set this to null to create the original hash again
+        // since the hash was not there when the original hash was generated.
         self.hash = null
         // Recalculate the hash of the Block
         let newHash = SHA256(JSON.stringify(self)).toString()
