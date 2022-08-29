@@ -75,10 +75,17 @@ class Block {
     return new Promise((resolve, reject) => {
       try {
         // Getting the encoded data saved in the Block
+        let machineData = this.data
         // Decoding the data to retrieve the JSON representation of the object
+        let humanData = hex2ascii(machineData)
         // Parse the data to an object to be retrieve.
-
-        // Resolve with the data if the object isn't the Genesis block
+        let jsonData = JSON.parse(humanData)
+        // Resolve with the data if the object isn't the Genesis block (height == 0)
+        if (self.height > 0) {
+          resolve(jsonData)
+        } else {
+          reject(new Error('Genesis block not an actual block...'))
+        }
       } catch (err) {
         reject(new Error(err))
       }
