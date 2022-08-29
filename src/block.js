@@ -34,7 +34,7 @@ class Block {
      *  5. Resolve true or false depending if it is valid or not.
      *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
      */
-  validate () {
+  validate() {
     let self = this
     return new Promise((resolve, reject) => {
       try {
@@ -70,13 +70,19 @@ class Block {
      *  3. Resolve with the data and make sure that you don't need to return the data for the `genesis block` 
      *     or Reject with an error.
      */
-  getBData() {
-    // Getting the encoded data saved in the Block
-    // Decoding the data to retrieve the JSON representation of the object
-    // Parse the data to an object to be retrieve.
+  getBData () {
+    let self = this
+    return new Promise((resolve, reject) => {
+      try {
+        // Getting the encoded data saved in the Block
+        // Decoding the data to retrieve the JSON representation of the object
+        // Parse the data to an object to be retrieve.
 
-    // Resolve with the data if the object isn't the Genesis block
-
+        // Resolve with the data if the object isn't the Genesis block
+      } catch (err) {
+        reject(new Error(err))
+      }
+    })
   }
 }
 
