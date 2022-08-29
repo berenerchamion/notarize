@@ -50,7 +50,7 @@ class Blockchain {
 
   /**
      * _addBlock(block) will store a block in the chain
-     * @param {*} block 
+     * @param {*} block
      * The method will return a Promise that will resolve with the block added
      * or reject if an error happen during the execution.
      * You will need to check for the height to assign the `previousBlockHash`,
@@ -63,7 +63,17 @@ class Blockchain {
   _addBlock (block) {
     let self = this
     return new Promise(async (resolve, reject) => {
-
+      // Already created the Genesis block with the initializeCHain method()
+      block.height = self.chain.length // Block Height (consecutive number of each block)
+      block.time = new Date().getTime().toString().slice(0, -3) // Timestamp for the Block creation
+      // if this is not the genesis block
+      if (self.chain.length > 0) {
+        block.previousBlockHash = self.chain[self.chain.length - 1].hash // Reference to the previous Block Hash
+      }
+      block.hash = SHA256(JSON.stringify(block)).toString() // Hash of the bloc
+      self.chain.push(block)
+      self.height++
+      resolve(block)
     })
   }
 
