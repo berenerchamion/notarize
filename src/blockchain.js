@@ -192,7 +192,29 @@ class Blockchain {
     let self = this
     let errorLog = []
     return new Promise(async (resolve, reject) => {
-
+      let goodPromises = []
+      let position = 0
+      // Check the hashes to make sure tehy match and log errors
+      self.chain.forEach(block => {
+        goodPromises.push(block.validate())
+        if (block.height > 0) {
+          if (self.chain[position - 1].hash !== block.previousBlockHash) {
+            errorLog.push(`Hash mismatch at ${block.height}`)
+          }
+          position++
+        }
+      })
+      // Check the goodPromises to make sure they are good.
+      Promise.all(goodPromises).then((results) => {
+        position = 0
+        results.forEach(good => {
+          if (!good) {
+            errorLog.push(`We have some problem on the chain at ${self.chain[position].height}`)
+          }
+          position++
+        })
+        resolve(errorLog)
+      })
     })
   }
 }

@@ -14,7 +14,7 @@ const hex2ascii = require('hex2ascii')
 
 class Block {
   // Constructor - argument data will be the object containing the transaction data
-  constructor(data) {
+  constructor (data) {
     this.hash = null // Hash of the block
     this.height = 0 // Block Height (consecutive number of each block)
     this.body = Buffer.from(JSON.stringify(data)).toString('hex') // Will contain the transactions stored in the block, by default it will encode the data
@@ -34,7 +34,7 @@ class Block {
      *  5. Resolve true or false depending if it is valid or not.
      *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
      */
-  validate() {
+  validate () {
     let self = this
     return new Promise((resolve, reject) => {
       try {
