@@ -73,7 +73,6 @@ class Blockchain {
       block.hash = SHA256(JSON.stringify(block)).toString() // Hash of the bloc
       self.chain.push(block)
       self.height++
-      console.log(block.hash)
       resolve(block)
     })
   }
@@ -178,13 +177,10 @@ class Blockchain {
   getStarsByWalletAddress (address) {
     let self = this
     let stars = []
-    console.log(address)
     return new Promise((resolve, reject) => {
       self.chain.forEach((block) => {
-        console.log(`In the loop block.height is ${block.height}`)
         let data = block.getBData()
         if (data) {
-          console.log(`getStarsByWalletAddress data: ${JSON.stringify(data)}`)
           if (data.owner === address) {
             stars.push(data)
           }
@@ -200,7 +196,7 @@ class Blockchain {
      * 1. You should validate each block using `validateBlock`
      * 2. Each Block should check the with the previousBlockHash
      */
-  validateChain() {
+  validateChain () {
     let self = this
     let errorLog = []
     return new Promise(async (resolve, reject) => {
