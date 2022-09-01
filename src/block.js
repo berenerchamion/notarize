@@ -72,32 +72,14 @@ class Block {
      */
   getBData () {
     let self = this
-    console.log('lets see data!')
-    return new Promise((resolve, reject) => {
-      try {
-        // Getting the encoded data saved in the Block
-        let machineData = self.body
-        // Decoding the data to retrieve the JSON representation of the object
-        let humanData = hex2ascii(machineData)
-        // Parse the data to an object to be retrieve.
-        let jsonData = JSON.parse(humanData)
-        console.log(`In getBData machineData: ${machineData}`)
-        console.log(`In getBData humanData: ${humanData}`)
-        console.log(`In getBData jsonData.owner: ${jsonData.owner}`)
-        console.log(`In getBData height: ${self.height}`)
-        // Resolve with the data if the object isn't the Genesis block (height == 0)
-        if (this.height > 0 && jsonData) {
-          console.log(`I got a star! Resolving...${JSON.stringify(jsonData)}`)
-          resolve(jsonData)
-        } else {
-          console.log(`In getBData else statement jsonData: ${jsonData}`)
-          console.log(`In getBData else statement height: ${self.height}`)
-          reject(new Error('Genesis else statement block not an actual block...'))
-        }
-      } catch (err) {
-        reject(new Error(err))
-      }
-    })
+    let machineData = self.body
+    let dataJson = hex2ascii(machineData)
+    let data = JSON.parse(dataJson)
+    // Make sure we do not return the genesis block
+    if (data && this.height > 0) {
+      return data
+    }
+    // Just don't return anything if it's the genesis block
   }
 }
 
