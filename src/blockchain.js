@@ -13,14 +13,14 @@ const BlockClass = require('./block.js')
 const bitcoinMessage = require('bitcoinjs-message')
 
 class Blockchain {
-/**
-     * Constructor of the class, you will need to setup your chain array and the height
-     * of your chain (the length of your chain array).
-     * Also everytime you create a Blockchain class you will need to initialized the chain creating
-     * the Genesis Block.
-     * The methods in this class will always return a Promise to allow client applications or
-     * other backends to call asynchronous functions.
-     */
+  /**
+       * Constructor of the class, you will need to setup your chain array and the height
+       * of your chain (the length of your chain array).
+       * Also everytime you create a Blockchain class you will need to initialized the chain creating
+       * the Genesis Block.
+       * The methods in this class will always return a Promise to allow client applications or
+       * other backends to call asynchronous functions.
+       */
   constructor () {
     this.chain = []
     this.height = -1
@@ -73,6 +73,7 @@ class Blockchain {
       block.hash = SHA256(JSON.stringify(block)).toString() // Hash of the bloc
       self.chain.push(block)
       self.height++
+      console.log(block.hash)
       resolve(block)
     })
   }
@@ -118,7 +119,7 @@ class Blockchain {
       if (time + (fiveMinutes) >= currentTime) {
         let isSigValid = bitcoinMessage.verify(message, address, signature)
         if (isSigValid) {
-          let block = new BlockClass({
+          let block = new BlockClass.Block({
             owner: address,
             star: star
           })
@@ -172,13 +173,24 @@ class Blockchain {
      * This method will return a Promise that will resolve with an array of Stars objects existing in the chain 
      * and are belongs to the owner with the wallet address passed as parameter.
      * Remember the star should be returned decoded.
-     * @param {*} address 
+     * @param {*} address
      */
   getStarsByWalletAddress (address) {
     let self = this
     let stars = []
+    console.log(address)
     return new Promise((resolve, reject) => {
-
+      self.chain.forEach((block) => {
+        console.log(`In the loop block.height is ${block.height}`)
+        let data = block.getBData()
+        if (data) {
+          console.log(`getStarsByWalletAddress data: ${JSON.stringify(data)}`)
+          if (data.owner === address) {
+            stars.push(data)
+          }
+        }
+      })
+      resolve(stars)
     })
   }
 
@@ -188,7 +200,7 @@ class Blockchain {
      * 1. You should validate each block using `validateBlock`
      * 2. Each Block should check the with the previousBlockHash
      */
-  validateChain () {
+  validateChain() {
     let self = this
     let errorLog = []
     return new Promise(async (resolve, reject) => {
