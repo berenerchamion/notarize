@@ -59,7 +59,7 @@ class BlockchainController {
       if (log.length > 0) {
         console.log('Houston, we have a problem')
       } else {
-        return res.status(200).send('All good in the world.')
+        return res.status(200).send('All is good in the world.')
       }
     })
   }

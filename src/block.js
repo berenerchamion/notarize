@@ -49,10 +49,10 @@ class Block {
         self.hash = newHash
         // Comparing if the hashes changed
         if (currentHash === newHash) {
-          // Returning the Block is not valid
+          // Returning the Block is valid
           resolve(true)
         } else {
-          // Returning the Block is valid
+          // Returning the Block is not valid
           resolve(false)
         }
       } catch (err) {

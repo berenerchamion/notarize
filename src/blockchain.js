@@ -63,27 +63,66 @@ class Blockchain {
   _addBlock (block) {
     let self = this
     return new Promise(async (resolve, reject) => {
-      // Already created the Genesis block with the initializeCHain method()
-      block.height = self.chain.length // Block Height (consecutive number of each block)
-      block.time = new Date().getTime().toString().slice(0, -3) // Timestamp for the Block creation
-      // if this is not the genesis block
-      if (self.chain.length > 0) {
-        block.previousBlockHash = self.chain[self.chain.length - 1].hash // Reference to the previous Block Hash
-      }
-      block.hash = SHA256(JSON.stringify(block)).toString() // Hash of the bloc
-      self.chain.push(block)
-      self.height++
-      resolve(block)
-      /** 
-      let log = await self.validateChain()
-      if (log.length > 0) {
-        console.log('Chain validation failed!')
-        self.chain.pop()
-        self.height--
-        reject(new Error(log))
-      } else {
+      try {
+        // Already created the Genesis block with the initializeCHain method()
+        block.height = self.chain.length // Block Height (consecutive number of each block)
+        block.time = new Date().getTime().toString().slice(0, -3) // Timestamp for the Block creation
+        // if this is not the genesis block
+        if (self.chain.length > 0) {
+          block.previousBlockHash = self.chain[self.chain.length - 1].hash // Reference to the previous Block Hash
+        }
+        block.hash = SHA256(JSON.stringify(block)).toString() // Hash of the bloc
+        self.chain.push(block)
+        self.height++
+        console.log('Chain validation start')
+        let log = await self.validateChain()
+        console.log('chain validation complete')
+        if (log.length > 0) {
+          console.log('Chain validation failed!')
+          reject(new Error(log))
+        }
+        console.log(block.hash)
         resolve(block)
-      } */
+      } catch (error) {
+        console.log('Catastrophic failure in _addBlock()')
+        reject(new Error('Catastrophic failure in _addBlock()'))
+      }
+    })
+  }
+
+  /**
+     * This method will return a Promise that will resolve with the list of errors when validating the chain.
+     * Steps to validate:
+     * 1. You should validate each block using `validateBlock`
+     * 2. Each Block should check the with the previousBlockHash
+     */
+  validateChain () {
+    let self = this
+    let errorLog = []
+    return new Promise(async (resolve, reject) => {
+      let promises = []
+      let position = 0
+      self.chain.forEach(block => {
+        promises.push(block.validate())
+        if (block.height > 0) {
+          if (block.previousBlockHash !== self.chain[position - 1].hash) {
+            errorLog.push(`The hashes are not matching for blocks ${block.height} and ${block.height - 1}!`)
+          }
+        }
+        position++
+      })
+      Promise.all(promises).then((results) => {
+        position = 0
+        results.forEach(valid => {
+          if (!valid) {
+            errorLog.push(`Block ${self.chain[position].height} has been messed with`)
+          }
+          position++
+        })
+        resolve(errorLog)
+      }).catch((err) => { console.log(err); reject(err) })
+      // Attributing this catch trick with a .then to this SO post:
+      // https://stackoverflow.com/questions/27413715/catch-without-try-in-javascript-and-promise
     })
   }
 
@@ -147,7 +186,7 @@ class Blockchain {
      * This method will return a Promise that will resolve with the Block
      *  with the hash passed as a parameter.
      * Search on the chain array for the block that has the hash.
-     * @param {*} hash 
+     * @param {*} hash
      */
   getBlockByHash (hash) {
     let self = this
@@ -197,42 +236,6 @@ class Blockchain {
         }
       })
       resolve(stars)
-    })
-  }
-
-  /**
-     * This method will return a Promise that will resolve with the list of errors when validating the chain.
-     * Steps to validate:
-     * 1. You should validate each block using `validateBlock`
-     * 2. Each Block should check the with the previousBlockHash
-     */
-  validateChain () {
-    let self = this
-    let errorLog = []
-    return new Promise(async (resolve, reject) => {
-      let goodPromises = []
-      let position = 0
-      // Check the hashes to make sure tehy match and log errors
-      self.chain.forEach(block => {
-        goodPromises.push(block.validate())
-        if (block.height > 0) {
-          if (self.chain[position - 1].hash !== block.previousBlockHash) {
-            errorLog.push(`Hash mismatch at ${block.height}`)
-          }
-          position++
-        }
-      })
-      // Check the goodPromises to make sure they are good.
-      Promise.all(goodPromises).then((results) => {
-        position = 0
-        results.forEach(good => {
-          if (!good) {
-            errorLog.push(`We have some problem on the chain at ${self.chain[position].height}`)
-          }
-          position++
-        })
-        resolve(errorLog)
-      })
     })
   }
 }
