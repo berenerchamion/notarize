@@ -120,7 +120,7 @@ class Blockchain {
           position++
         })
         resolve(errorLog)
-      }).catch((err) => { console.log(err); reject(err) })
+      }).catch((error) => { console.log(error); reject(error) })
       // Attributing this catch trick with a .then to this SO post:
       // https://stackoverflow.com/questions/27413715/catch-without-try-in-javascript-and-promise
     })
