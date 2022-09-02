@@ -74,9 +74,7 @@ class Blockchain {
         block.hash = SHA256(JSON.stringify(block)).toString() // Hash of the bloc
         self.chain.push(block)
         self.height++
-        console.log('Chain validation start')
         let log = await self.validateChain()
-        console.log('chain validation complete')
         if (log.length > 0) {
           console.log('Chain validation failed!')
           reject(new Error(log))
